@@ -1,20 +1,22 @@
 package patternforge;
 
-import java.util.Arrays;
-
 /**
- * A single generated problem instance.
- * Holds the question text, the input, and the correct answer,
- * so the generator can prove its own output is solvable before
- * it ever reaches a user.
+ * A generated problem instance.
+ *
+ * @param <I> Input type
+ * @param <O> Expected output type
  */
-public class Problem {
+public class Problem<I, O> {
 
     private final String description;
-    private final int[] input;
-    private final int[] expectedOutput;
+    private final I input;
+    private final O expectedOutput;
 
-    public Problem(String description, int[] input, int[] expectedOutput) {
+    public Problem(
+            String description,
+            I input,
+            O expectedOutput
+    ) {
         this.description = description;
         this.input = input;
         this.expectedOutput = expectedOutput;
@@ -24,20 +26,19 @@ public class Problem {
         return description;
     }
 
-    public int[] getInput() {
+    public I getInput() {
         return input;
     }
 
-    public int[] getExpectedOutput() {
+    public O getExpectedOutput() {
         return expectedOutput;
     }
 
     @Override
     public String toString() {
         return description
-                + "\nInput:    " + Arrays.toString(input)
-                + "\nExpected: " + Arrays.toString(expectedOutput);
+                + "\nInput:    " + input
+                + "\nExpected: " + expectedOutput;
     }
 }
-    
 
