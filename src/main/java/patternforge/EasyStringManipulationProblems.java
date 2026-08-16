@@ -87,7 +87,7 @@ public class EasyStringManipulationProblems {
 
         int[] expected = {expectedValue};
 
-        String description = String.format("Given a string of length %d, determine if it is a palindrome");
+        String description = String.format("Given a string of length %d, determine if it is a palindrome", length);
 
         return new Problem<>(description, input, expected);
     }
@@ -126,7 +126,7 @@ public class EasyStringManipulationProblems {
                 int wordLength = minWordLength + random.nextInt(maxWordLength - minWordLength + 1);
                 wordLength = Math.max(wordLength, 1);
 
-                sentence.append(randomLowercaseWord(wordLength));
+                sentence.append(randomLowerCaseWord(wordLength));
 
                  if (i < wordCount - 1) {
                 sentence.append(' ');
