@@ -1,0 +1,397 @@
+package patternforge;
+
+import java.util.Random;
+
+    /** Easy tier String manipulation questions
+     * 
+     * Chosen questions that cover common themes in most easy questions:
+     * - Reverse String (344)
+     * - Valid Palindrome (125)
+     * - Reverse Words in a String 3 (557)
+     * - Longest Common Prefix (14)
+     * - Is Subsequence (392)
+     * - First Unique Char in a String (387)
+     */
+
+public class EasyStringManipulationProblems {
+
+    private final Random random;
+
+    public EasyStringManipulationProblems(){
+        this.random = new Random();
+    }
+
+    public EasyStringManipulationProblems(long seed){
+        this.random = new Random(seed);
+    }
+
+    //344
+
+    public Problem<char[], char[]> generateReverseStringProblem(int minLength, int maxLength){
+
+        // returns a random int in the range [0, bound), ensures its never less than 1
+        int length = minLength + random.nextInt(maxLength - minLength + 1);
+        length = Math.max(length, 1);
+
+        char[] input = randomLowerCaseWord(length);
+        char[] expected = reverseString(input.clone());
+
+        String description = String.format( "Given a character array of length %d, reverse it in place.",
+        length );
+
+        return new Problem<>(description, input.clone(), expected);
+    }
+
+    // model output
+
+    public static char[] reverseString(char[] s){
+
+        int left = 0;
+        int right = s.length - 1;
+
+        while (left < right){
+            char temp = s[left];
+            s[left] = s[right];
+            s[right] = temp;
+
+            left++;
+            right--;
+        }
+
+        return s;
+        
+    }
+
+    // 125
+
+    public Problem<String, int[]> generateValidPalindromeProblem(int minLength, int maxLength, boolean forcePalindrome){
+
+        int length = minLength + random.nextInt(maxLength - minLength + 1);
+        length = Math.max(length, 1);
+
+        String input;
+
+        if (forcePalindrome){
+            input = new String(randomPalindrome(length));
+        }else {
+            input = new String(randomLowerCaseWord(length));
+        }
+
+        boolean isPalindrome = isValidPalindrome(input);
+
+        int expectedValue = 0;
+
+        if (isPalindrome){
+            expectedValue = 1;
+        }
+
+        int[] expected = {expectedValue};
+
+        String description = String.format("Given a string of length %d, determine if it is a palindrome");
+
+        return new Problem<>(description, input, expected);
+    }
+
+    //model answer, two-pointer
+    public static boolean isValidPalindrome(String s){
+
+        int left = 0;
+        int right = s.length() - 1;
+
+        while(left < right){
+            if (s.charAt(left) != s.charAt(right)){
+                return false;
+            }
+
+            left++;
+            right--;
+
+        }
+
+        return true;
+    }
+
+    // 557
+
+    public Problem<String, String> generateReverseWordsProblem(int minWords, int maxWords, int minWordLength,
+        int maxWordLength){
+
+            int wordCount = minWords + random.nextInt(maxWords- minWords + 1);
+            wordCount = Math.max(wordCount, 1);
+
+            StringBuilder sentence = new StringBuilder();
+
+            for (int i = 0; i < wordCount; i++){
+
+                int wordLength = minWordLength + random.nextInt(maxWordLength - minWordLength + 1);
+                wordLength = Math.max(wordLength, 1);
+
+                sentence.append(randomLowercaseWord(wordLength));
+
+                 if (i < wordCount - 1) {
+                sentence.append(' ');
+            }
+        }
+
+        String input = sentence.toString();
+        String expected = reverseWordsInString(input);
+
+        String description = String.format(
+                "Given a sentence of %d word(s), reverse the characters of each word while preserving word order.",
+                wordCount
+        );
+
+        return new Problem<>(description, input, expected);
+    }
+
+    // model answer, split on spaces then StringBuilder.reverse() each word
+
+    public static String reverseWordsInString(String s){
+
+        String[] words = s.split(" ");
+        StringBuilder result = new StringBuilder();
+
+        for (int i = 0; i < words.length; i++){
+
+            result.append(new StringBuilder(words[i]).reverse());
+
+            if (i < words.length - 1){
+                result.append(' ');
+            }
+        }
+
+        return result.toString();
+    }
+
+    // 14
+
+    public Problem<String[], String> generateLongestCommonPrefixProblem(int minStrings, int maxStrings, int prefixLength, int maxSuffixLength, boolean forceNoCommonPrefix){
+
+        int stringCount = minStrings + random.nextInt(maxStrings - minStrings + 1);
+        stringCount = Math.max(stringCount, 1);
+
+        String[] input = new String[stringCount];
+
+        if (forceNoCommonPrefix && stringCount >= 2){
+
+            char firstLetter = (char) ('a' + random.nextInt(26));
+            char secondLetter;
+
+            do {
+                secondLetter = (char) ('a' + random.nextInt(26));
+            } while (secondLetter == firstLetter);
+
+            char[] suffix0 = randomLowerCaseWord(random.nextInt(maxSuffixLength + 1));
+            char[] suffix1 = randomLowerCaseWord(random.nextInt(maxSuffixLength + 1));
+
+            input[0] = firstLetter + new String(suffix0);
+            input[1] = secondLetter + new String(suffix1);
+
+            for (int i = 2; i < stringCount; i++){
+                char[] word = randomLowerCaseWord(1 + random.nextInt(maxSuffixLength + 1));
+                input[i] = new String(word);
+            }
+
+        }else {
+
+            prefixLength = Math.max(prefixLength, 1);
+            char[] prefix = randomLowerCaseWord(prefixLength);
+
+            for (int i = 0; i < stringCount; i++){
+                char[] suffix = randomLowerCaseWord(random.nextInt(maxSuffixLength + 1));
+                input[i] = new String(prefix) + new String(suffix);
+            }
+        }
+
+        String expected = longestCommonPrefix(input);
+
+        String description = String.format("Given %d strings, return their longest common prefix.", stringCount);
+
+        return new Problem<>(description, input, expected);
+    }
+
+    // model answer, shrink candidate prefix from the first string until every string starts with it
+
+    public static String longestCommonPrefix(String[] strs){
+
+        if (strs.length == 0){
+            return "";
+        }
+
+        String prefix = strs[0];
+
+        for (int i = 1; i < strs.length; i++){
+
+            while (!strs[i].startsWith(prefix)){
+                prefix = prefix.substring(0, prefix.length() - 1);
+
+                if (prefix.isEmpty()){
+                    return "";
+                }
+            }
+        }
+
+        return prefix;
+    }
+
+    // 392
+
+    public Problem<String[], int[]> generateIsSubsequenceProblem(int minLength, int maxLength, boolean forceSubsequence){
+
+        int tLength = minLength + random.nextInt(maxLength - minLength + 1);
+        tLength = Math.max(tLength, 1);
+
+        char[] t = randomLowerCaseWord(tLength);
+        char[] s;
+
+        if (forceSubsequence){
+            s = randomSubsequenceOf(t);
+        }else {
+            s = randomLowerCaseWord(1 + random.nextInt(tLength));
+        }
+
+        boolean isSubsequence = isSubsequence(new String(s), new String(t));
+
+        int expectedValue = 0;
+
+        if (isSubsequence){
+            expectedValue = 1;
+        }
+
+        int[] expected = {expectedValue};
+        String[] input = {new String(s), new String(t)};
+
+        String description = String.format("Given strings s and t, determine if s is a subsequence of t (length %d).", tLength);
+
+        return new Problem<>(description, input, expected);
+    }
+
+    // model answer, two-pointer: advance i through s only on a match, always advance j through t
+
+    public static boolean isSubsequence(String s, String t){
+
+        int i = 0;
+        int j = 0;
+
+        while (i < s.length() && j < t.length()){
+
+            if (s.charAt(i) == t.charAt(j)){
+                i++;
+            }
+
+            j++;
+        }
+
+        return i == s.length();
+    }
+
+    // 387
+
+    public Problem<String, int[]> generateFirstUniqueCharProblem(int minLength, int maxLength, boolean forceUnique){
+
+        int length = minLength + random.nextInt(maxLength - minLength + 1);
+        length = Math.max(length, 1);
+
+        char[] chars = randomLowerCaseWord(length);
+
+        if (forceUnique){
+            chars[0] = uniqueLetterNotIn(chars, 1);
+        }
+
+        String input = new String(chars);
+        int index = firstUniqueChar(input);
+        int[] expected = {index};
+
+        String description = String.format("Given a string of length %d, return the index of its first non-repeating character, or -1 if none exists.", chars.length);
+
+        return new Problem<>(description, input, expected);
+    }
+
+    // model answer, count occurrences of each letter then scan for the first count of exactly 1
+
+    public static int firstUniqueChar(String s){
+
+        int[] counts = new int[26];
+
+        for (char c : s.toCharArray()){
+            counts[c - 'a']++;
+        }
+
+        for (int i = 0; i < s.length(); i++){
+            if (counts[s.charAt(i) - 'a'] == 1){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    // helpers
+
+    private char[] randomLowerCaseWord(int length){
+
+        char[] word = new char[length];
+
+        for (int i = 0; i < length; i++){
+            word[i] = (char) ('a' + random.nextInt(26));
+        }
+
+        return word;
+    }
+
+    private char[] randomPalindrome(int length){
+
+        char[] half = randomLowerCaseWord((length + 1) / 2);
+        char[] result = new char[length];
+
+        for (int i = 0; i < length; i++){
+
+            int mirrored;
+
+            if (i < length / 2){
+                mirrored = i;
+            }else {
+                mirrored = length - 1 - i;
+            }
+
+            result[i] = half[mirrored];
+        }
+
+        return result;
+    }
+
+    private char[] randomSubsequenceOf(char[] source){
+
+        StringBuilder result = new StringBuilder();
+
+        for (char c : source){
+            if (random.nextBoolean()){
+                result.append(c);
+            }
+        }
+
+        if (result.length() == 0 && source.length > 0){
+            result.append(source[0]);
+        }
+
+        return result.toString().toCharArray();
+    }
+
+    private char uniqueLetterNotIn(char[] chars, int fromIndex){
+
+        int[] counts = new int[26];
+
+        for (int i = fromIndex; i < chars.length; i++){
+            counts[chars[i] - 'a']++;
+        }
+
+        for (char c = 'a'; c <= 'z'; c++){
+            if (counts[c - 'a'] == 0){
+                return c;
+            }
+        }
+
+        return chars[0];
+    }
+
+}
