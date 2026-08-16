@@ -234,4 +234,55 @@ public class EasyStringManipulationProblems {
         return prefix;
     }
 
+    // 392
+
+    public Problem<String[], int[]> generateIsSubsequenceProblem(int minLength, int maxLength, boolean forceSubsequence){
+
+        int tLength = minLength + random.nextInt(maxLength - minLength + 1);
+        tLength = Math.max(tLength, 1);
+
+        char[] t = randomLowerCaseWord(tLength);
+        char[] s;
+
+        if (forceSubsequence){
+            s = randomSubsequenceOf(t);
+        }else {
+            s = randomLowerCaseWord(1 + random.nextInt(tLength));
+        }
+
+        boolean isSubsequence = isSubsequence(new String(s), new String(t));
+
+        int expectedValue = 0;
+
+        if (isSubsequence){
+            expectedValue = 1;
+        }
+
+        int[] expected = {expectedValue};
+        String[] input = {new String(s), new String(t)};
+
+        String description = String.format("Given strings s and t, determine if s is a subsequence of t (length %d).", tLength);
+
+        return new Problem<>(description, input, expected);
+    }
+
+    // model answer, two-pointer: advance i through s only on a match, always advance j through t
+
+    public static boolean isSubsequence(String s, String t){
+
+        int i = 0;
+        int j = 0;
+
+        while (i < s.length() && j < t.length()){
+
+            if (s.charAt(i) == t.charAt(j)){
+                i++;
+            }
+
+            j++;
+        }
+
+        return i == s.length();
+    }
+
 }
