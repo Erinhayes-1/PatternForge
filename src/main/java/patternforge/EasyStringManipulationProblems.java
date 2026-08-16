@@ -339,4 +339,59 @@ public class EasyStringManipulationProblems {
         return word;
     }
 
+    private char[] randomPalindrome(int length){
+
+        char[] half = randomLowerCaseWord((length + 1) / 2);
+        char[] result = new char[length];
+
+        for (int i = 0; i < length; i++){
+
+            int mirrored;
+
+            if (i < length / 2){
+                mirrored = i;
+            }else {
+                mirrored = length - 1 - i;
+            }
+
+            result[i] = half[mirrored];
+        }
+
+        return result;
+    }
+
+    private char[] randomSubsequenceOf(char[] source){
+
+        StringBuilder result = new StringBuilder();
+
+        for (char c : source){
+            if (random.nextBoolean()){
+                result.append(c);
+            }
+        }
+
+        if (result.length() == 0 && source.length > 0){
+            result.append(source[0]);
+        }
+
+        return result.toString().toCharArray();
+    }
+
+    private char uniqueLetterNotIn(char[] chars, int fromIndex){
+
+        int[] counts = new int[26];
+
+        for (int i = fromIndex; i < chars.length; i++){
+            counts[chars[i] - 'a']++;
+        }
+
+        for (char c = 'a'; c <= 'z'; c++){
+            if (counts[c - 'a'] == 0){
+                return c;
+            }
+        }
+
+        return chars[0];
+    }
+
 }
