@@ -285,4 +285,58 @@ public class EasyStringManipulationProblems {
         return i == s.length();
     }
 
+    // 387
+
+    public Problem<String, int[]> generateFirstUniqueCharProblem(int minLength, int maxLength, boolean forceUnique){
+
+        int length = minLength + random.nextInt(maxLength - minLength + 1);
+        length = Math.max(length, 1);
+
+        char[] chars = randomLowerCaseWord(length);
+
+        if (forceUnique){
+            chars[0] = uniqueLetterNotIn(chars, 1);
+        }
+
+        String input = new String(chars);
+        int index = firstUniqueChar(input);
+        int[] expected = {index};
+
+        String description = String.format("Given a string of length %d, return the index of its first non-repeating character, or -1 if none exists.", chars.length);
+
+        return new Problem<>(description, input, expected);
+    }
+
+    // model answer, count occurrences of each letter then scan for the first count of exactly 1
+
+    public static int firstUniqueChar(String s){
+
+        int[] counts = new int[26];
+
+        for (char c : s.toCharArray()){
+            counts[c - 'a']++;
+        }
+
+        for (int i = 0; i < s.length(); i++){
+            if (counts[s.charAt(i) - 'a'] == 1){
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
+    // helpers
+
+    private char[] randomLowerCaseWord(int length){
+
+        char[] word = new char[length];
+
+        for (int i = 0; i < length; i++){
+            word[i] = (char) ('a' + random.nextInt(26));
+        }
+
+        return word;
+    }
+
 }
